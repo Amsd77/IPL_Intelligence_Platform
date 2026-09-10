@@ -23,7 +23,7 @@ The planned platform will eventually cover:
 
 ## 3. Current Development Stage
 
-Current stage: **Foundation / Data Engineering — ingestion and data-quality foundation completed**
+Current stage: **Analytics Foundation — data-engineering foundation completed and core player, team, and match analytics implemented**
 
 Completed:
 
@@ -44,6 +44,12 @@ Completed:
 - Idempotency verification
 - Data-quality issue persistence and audit verification
 - Full regression test suite
+- Player batting analytics
+- Player bowling analytics
+- Team batting analytics
+- Team bowling analytics
+- Match summary analytics
+- Match innings analytics
 
 ### Current verified dataset load
 
@@ -58,7 +64,17 @@ Completed:
 - Reconciliation: **PASS**
 - Idempotency check: **PASS**
 
-## 4. Core Design Principle
+## 4. Analytics Foundation
+
+The analytics layer currently provides reusable SQL-backed functions for player, team, and match-level analysis over the trusted PostgreSQL dataset.
+
+Implemented match analytics include:
+
+- Match summary metadata, participating teams, toss winner, and winner
+- Innings-level runs, wickets lost, deliveries, legal deliveries, and run rate
+- Separate delivery and wicket aggregation to prevent row multiplication during innings calculations
+
+## 5. Core Design Principle
 
 The project follows:
 
@@ -66,7 +82,7 @@ The project follows:
 
 We do not design the production pipeline from assumptions about the source data. The raw dataset is profiled first, and implementation decisions are documented.
 
-## 5. Source Data
+## 6. Source Data
 
 The current source is Cricsheet IPL match JSON data.
 
@@ -80,7 +96,7 @@ Raw data should not be manually modified.
 
 Historical team-name variations are normalized through a team-alias mapping layer.
 
-## 6. High-Level Architecture
+## 7. High-Level Architecture
 
 ```text
 Cricsheet JSON
@@ -117,7 +133,7 @@ PostgreSQL
 API / Application
 ```
 
-## 7. Database Design Summary
+## 8. Database Design Summary
 
 The relational model separates dimensions, match/innings relationships, and delivery-level facts.
 
@@ -140,7 +156,7 @@ Operational/audit entities include:
 - `etl_file_log`
 - `etl_file_quality_issue`
 
-## 8. Current Quality Policy
+## 9. Current Quality Policy
 
 Data-quality rules are divided into:
 
@@ -154,7 +170,7 @@ Current warning findings from the full validation analysis:
 - Total warnings: 60
 - Blocking DQ errors: 0
 
-## 9. Intended Users
+## 10. Intended Users
 
 The platform is being designed for:
 
@@ -164,7 +180,7 @@ The platform is being designed for:
 - AI/ML users
 - End users asking cricket-related questions
 
-## 10. Documentation Philosophy
+## 11. Documentation Philosophy
 
 Every major implementation should document:
 

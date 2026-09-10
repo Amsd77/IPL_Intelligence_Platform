@@ -1,5 +1,38 @@
 # Change Log
 
+## 2026-09-10 — Analytics Foundation: Match Analytics
+
+### Match summary analytics
+
+Implemented `src/analytics/match_analytics.py` for single-match summary retrieval, including match metadata, participating teams, toss winner and decision, match winner, and player of the match.
+
+The participating-team string is deterministically ordered by team name rather than source/home-away order.
+
+### Match innings analytics
+
+Implemented `src/analytics/match_innings.py` for innings-level statistics:
+
+- batting team
+- runs
+- wickets lost
+- total delivery records
+- legal deliveries
+- run rate
+
+Legal deliveries exclude wides and no-balls. Retired-hurt events are excluded from wickets lost.
+
+### Important engineering decision
+
+Delivery statistics and wicket statistics are aggregated separately so that joining delivery rows to multiple wicket rows cannot multiply delivery records and inflate runs, deliveries, or related metrics.
+
+### Verification
+
+- Full regression suite: **45 passed**
+- Match summary validated against real PostgreSQL data
+- Match innings validated across multiple matches
+- Legal-delivery and innings calculations verified for matches containing illegal deliveries
+
+
 ## 2026-08-22 — Project Foundation
 
 ### Project initialized

@@ -25,14 +25,23 @@ The project currently has tests covering:
 - data-quality rules
 - negative DQ cases
 - database/ETL behavior
+- player and team analytics
+- match summary analytics
+- match innings analytics
 
-The full regression suite after DQ integration passed:
+The full regression suite after the Analytics Foundation additions passed:
 
 ```text
-23 passed
+45 passed
 ```
 
-## 3. Data Quality Tests
+## 3. Analytics Tests
+
+Match analytics tests cover successful result mapping, unknown-match behavior, and validation of invalid match IDs. Match innings tests cover innings result mapping, empty results for unknown matches, and invalid match ID validation.
+
+The implementation was also validated against real PostgreSQL data across multiple matches, including matches containing wides/no-balls and wicket events. The validation confirmed that legal-delivery counts do not exceed total delivery counts and that innings run rates and wicket counts remain internally consistent.
+
+## 4. Data Quality Tests
 
 Positive tests verify that valid source matches pass.
 
@@ -49,7 +58,7 @@ Negative tests cover the current blocking and warning rules, including:
 - DQ010
 - DQ011
 
-## 4. Source Integrity Test
+## 5. Source Integrity Test
 
 The source was checked for:
 
@@ -67,7 +76,7 @@ Duplicate IDs    : 0
 SOURCE INTEGRITY : PASS
 ```
 
-## 5. Reconciliation Test
+## 6. Reconciliation Test
 
 Source counts were compared with PostgreSQL counts.
 
@@ -77,7 +86,7 @@ Result:
 RECONCILIATION : PASS
 ```
 
-## 6. Idempotency Test
+## 7. Idempotency Test
 
 A loaded match was processed again and its business-row counts remained unchanged.
 
@@ -87,13 +96,13 @@ Result:
 IDEMPOTENCY : PASS
 ```
 
-## 7. Data Quality Audit Test
+## 8. Data Quality Audit Test
 
 A real warning case was processed and persisted to `etl_file_quality_issue`.
 
 A synthetic ERROR audit case was also tested and then removed so test data did not remain in the production-like database.
 
-## 8. Recommended Developer Check
+## 9. Recommended Developer Check
 
 Before a logical commit:
 
@@ -103,7 +112,7 @@ pytest -q
 
 For ETL changes, also run the relevant ingestion/reconciliation checks.
 
-## 9. Testing Principle
+## 10. Testing Principle
 
 A feature is not considered complete merely because the code executes.
 
