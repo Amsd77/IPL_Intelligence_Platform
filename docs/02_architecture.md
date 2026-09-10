@@ -4,7 +4,7 @@
 
 The platform is designed as a layered system where each responsibility is isolated.
 
-The current implementation focuses on the data-engineering foundation. Analytics, ML, GenAI, RAG, API, UI, and deployment are downstream layers and are not yet implemented.
+The current implementation covers the data-engineering foundation and the first Analytics Foundation layer. ML, GenAI, RAG, API, UI, and deployment remain downstream layers.
 
 ## 2. Current Data Flow
 
@@ -69,6 +69,10 @@ Converts validated domain records into the representation expected by the databa
 
 Owns connection management, SQLAlchemy models, audit logging, and persistence.
 
+### Analytics
+
+Provides SQL-backed analytical functions over the trusted PostgreSQL data. Current modules cover player batting, player bowling, team batting, team bowling, match summaries, and match innings statistics.
+
 ## 4. PostgreSQL Model
 
 The current database uses a dimensional/event-oriented relational design.
@@ -95,7 +99,23 @@ The current database uses a dimensional/event-oriented relational design.
 - `etl_file_log`
 - `etl_file_quality_issue`
 
-## 5. Important Design Decisions
+## 5. Analytics Layer
+
+Analytics functions query PostgreSQL through SQLAlchemy sessions rather than duplicating business facts in application memory. Match-level analytics are built from the normalized match, innings, team, delivery, extra, and wicket tables.
+
+### Separate delivery and wicket aggregation
+
+Match innings statistics use separate aggregation paths for delivery statistics and wicket statistics. Joining `fact_delivery` directly to `delivery_wickets` can multiply delivery rows when a delivery contains multiple wicket records, which can inflate run and delivery counts. Separate CTEs avoid this row-multiplication problem while allowing each metric to use the appropriate grain.
+
+### Legal delivery semantics
+
+For innings analytics, legal deliveries exclude deliveries containing `wides` or `noballs`. Total delivery records and legal deliveries are therefore tracked separately.
+
+### Wicket-lost semantics
+
+Innings wickets lost exclude `retired hurt`, because that event does not represent a dismissal/wicket lost in scorecard-style innings analytics.
+
+## 6. Important Design Decisions
 
 ### Delivery-level storage
 
@@ -115,7 +135,7 @@ Historical team names are normalized through `dim_team_alias` rather than creati
 
 Data-quality findings are stored separately from the core cricket facts. This keeps operational quality information available without polluting analytical tables.
 
-## 6. Idempotency
+## 7. Idempotency
 
 The loader is designed to be safely rerunnable.
 
@@ -123,13 +143,13 @@ A rerun of an already loaded match does not create duplicate business rows.
 
 This is important for production ETL because retries are normal when processing files.
 
-## 7. Reconciliation Gate
+## 8. Reconciliation Gate
 
 The full dataset was reconciled from source counts to database counts.
 
 A downstream analytics or ML sprint should use reconciliation results as a gate before treating the database as trusted analytical input.
 
-## 8. Future Architecture
+## 9. Future Architecture
 
 The following layers will be added only when implemented:
 

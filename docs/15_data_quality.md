@@ -100,7 +100,21 @@ A real warning case was processed and verified in the database.
 
 A synthetic ERROR persistence case was also tested and removed afterward so test artifacts were not retained.
 
-## 8. Engineering Principle
+## 8. Analytics Data Semantics
+
+The analytics layer applies explicit metric semantics to the normalized event data.
+
+### Legal deliveries
+
+For innings-level run-rate calculations, wides and no-balls are excluded from the legal-delivery denominator. Total delivery records remain available as a separate metric.
+
+### Wickets lost
+
+Innings wickets lost exclude `retired hurt`, because a retirement hurt is not treated as a dismissal/wicket lost for scorecard-style analytics.
+
+These rules are analytical semantics rather than new ingestion DQ rules. They are documented here because they affect how downstream consumers interpret the trusted database facts.
+
+## 9. Engineering Principle
 
 Data quality is not only a gate.
 
