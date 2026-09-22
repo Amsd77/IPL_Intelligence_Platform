@@ -71,7 +71,7 @@ Owns connection management, SQLAlchemy models, audit logging, and persistence.
 
 ### Analytics
 
-Provides SQL-backed analytical functions over the trusted PostgreSQL data. Current modules cover player batting, player bowling, team batting, team bowling, match summaries, and match innings statistics.
+Provides SQL-backed analytical functions over the trusted PostgreSQL data. Current modules cover player batting, player bowling, team batting, team bowling, match summaries, match innings statistics, and venue statistics.
 
 ## 4. PostgreSQL Model
 
@@ -103,6 +103,31 @@ The current database uses a dimensional/event-oriented relational design.
 
 Analytics functions query PostgreSQL through SQLAlchemy sessions rather than duplicating business facts in application memory. Match-level analytics are built from the normalized match, innings, team, delivery, extra, and wicket tables.
 
+### Venue analytics
+
+Venue analytics follows the existing relational path:
+
+```text
+dim_venue
+   |
+   v
+dim_match
+   |
+   v
+match_innings
+   |
+   v
+fact_delivery
+   |
+   +--> delivery_extras
+   |
+   +--> delivery_wickets
+```
+
+The venue analytics module calculates match/innings volume, total and average runs, highest innings score, average innings run rate, and wicket-based statistics. Delivery and wicket metrics are aggregated through separate CTE paths to avoid row multiplication when a delivery contains multiple wicket records.
+
+The current implementation intentionally does not canonicalize venue-name variants inside analytical queries. Examples observed in the loaded dimension include `Wankhede Stadium` / `Wankhede Stadium, Mumbai` and `M.Chinnaswamy Stadium` / `M Chinnaswamy Stadium`. These are treated as a master-data standardization concern rather than silently merged in analytics.
+
 ### Separate delivery and wicket aggregation
 
 Match innings statistics use separate aggregation paths for delivery statistics and wicket statistics. Joining `fact_delivery` directly to `delivery_wickets` can multiply delivery rows when a delivery contains multiple wicket records, which can inflate run and delivery counts. Separate CTEs avoid this row-multiplication problem while allowing each metric to use the appropriate grain.
@@ -116,6 +141,10 @@ For innings analytics, legal deliveries exclude deliveries containing `wides` or
 Innings wickets lost exclude `retired hurt`, because that event does not represent a dismissal/wicket lost in scorecard-style innings analytics.
 
 ## 6. Important Design Decisions
+
+### Venue canonicalization boundary
+
+Venue analytics consumes `dim_venue` as the trusted analytical dimension and does not silently merge potentially equivalent venue names. Canonicalization must be implemented as a controlled master-data rule so historical aggregation changes are explicit, testable, and auditable.
 
 ### Delivery-level storage
 
@@ -174,3 +203,5 @@ UI
 ```
 
 No vector database or LLM layer is introduced merely because it is available; each future component must have a clear requirement.
+
+dim_venue → dim_match → match_innings → fact_delivery

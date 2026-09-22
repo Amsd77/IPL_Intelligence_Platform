@@ -23,7 +23,7 @@ The planned platform will eventually cover:
 
 ## 3. Current Development Stage
 
-Current stage: **Analytics Foundation — data-engineering foundation completed and core player, team, and match analytics implemented**
+Current stage: **Analytics Foundation — data-engineering foundation completed and player, team, match, and venue analytics implemented**
 
 Completed:
 
@@ -50,6 +50,8 @@ Completed:
 - Team bowling analytics
 - Match summary analytics
 - Match innings analytics
+- Venue analytics
+- Venue Analytics
 
 ### Current verified dataset load
 
@@ -73,6 +75,16 @@ Implemented match analytics include:
 - Match summary metadata, participating teams, toss winner, and winner
 - Innings-level runs, wickets lost, deliveries, legal deliveries, and run rate
 - Separate delivery and wicket aggregation to prevent row multiplication during innings calculations
+
+
+Venue analytics currently provides SQL-backed statistics by venue, including:
+- match and innings counts
+- total and average runs per innings
+- highest innings score
+- average innings run rate
+- total and average wickets per innings
+
+Venue analytics uses the existing `dim_venue` records as stored. Potential duplicate physical venues represented by different source names are not silently merged in analytics; venue canonicalization remains a separate master-data task.
 
 ## 5. Core Design Principle
 

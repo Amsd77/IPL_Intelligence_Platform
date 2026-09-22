@@ -1,5 +1,33 @@
 # Change Log
 
+## 2026-09-22 — Analytics Foundation: Venue Analytics
+
+### Venue analytics
+
+Implemented `src/analytics/venue_analytics.py` with:
+- single-venue statistics retrieval
+- top-venues retrieval with database-side `LIMIT`
+- match and innings counts
+- total and average runs per innings
+- highest innings score
+- average innings run rate
+- total and average wickets per innings
+
+### Important engineering decisions
+
+- Venue statistics are calculated from `dim_venue -> dim_match -> match_innings -> fact_delivery`.
+- Delivery and wicket statistics use separate aggregation paths to avoid row multiplication.
+- `retired hurt` is excluded from wickets lost, consistent with scorecard-style innings semantics.
+- Venue-name variants are not silently merged; canonicalization is treated as a separate master-data concern.
+
+### Verification
+
+- Venue-specific tests: **9 passed**
+- Full regression suite: **54 passed**
+- Real PostgreSQL validation completed for venue-level statistics.
+- `git diff --cached --check`: PASS before documentation update.
+
+
 ## 2026-09-10 — Analytics Foundation: Match Analytics
 
 ### Match summary analytics
@@ -103,6 +131,7 @@ Implemented and verified:
 - transformation layer
 - database loader
 - ETL run/file audit logging
+- Venue Analytics feature
 
 Important design decisions:
 

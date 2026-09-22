@@ -114,6 +114,24 @@ Innings wickets lost exclude `retired hurt`, because a retirement hurt is not tr
 
 These rules are analytical semantics rather than new ingestion DQ rules. They are documented here because they affect how downstream consumers interpret the trusted database facts.
 
+## 8. Venue master-data observation
+
+The loaded venue dimension contains name variants that may represent the same physical venue. Examples observed during Venue Analytics validation include:
+
+- `Wankhede Stadium`
+- `Wankhede Stadium, Mumbai`
+- `M.Chinnaswamy Stadium`
+- `M Chinnaswamy Stadium`
+
+This is a **master-data standardization observation**, not an analytics calculation error. The current analytics layer intentionally does not silently merge these records because doing so without an explicit canonicalization rule could change historical aggregates.
+
+A future venue-standardization step should define:
+- canonical venue identity
+- approved aliases
+- matching rules
+- historical backfill behavior
+- tests proving that the resulting aggregation is intentional
+
 ## 9. Engineering Principle
 
 Data quality is not only a gate.

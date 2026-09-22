@@ -28,12 +28,18 @@ The project currently has tests covering:
 - player and team analytics
 - match summary analytics
 - match innings analytics
+- Venue Analytics tests
+- real-data validation
 
-The full regression suite after the Analytics Foundation additions passed:
+The full regression suite after the Venue Analytics addition passed:
 
 ```text
-45 passed
+54 passed
 ```
+
+Venue-specific tests: **9 passed**.
+
+Venue analytics was also validated against real PostgreSQL data, including venue-level match/innings counts, run aggregates, highest innings score, run-rate calculations, and wicket counts.
 
 ## 3. Analytics Tests
 
