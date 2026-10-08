@@ -38,6 +38,8 @@ class TransformedMatch:
     toss_decision: str | None
 
     winner: str | None
+    outcome_result: str | None
+    outcome_deciding_team: str | None
 
     match_type: str | None
     gender: str | None
@@ -60,7 +62,7 @@ class TransformedDelivery:
 
     extras: tuple[ExtraRecord, ...]
     wickets: tuple
-    
+
 def _transform_deliveries(
     deliveries: tuple[DeliveryRecord, ...],
 ) -> tuple[TransformedDelivery, ...]:
@@ -94,7 +96,7 @@ class TransformedInnings:
     innings_number: int
     batting_team: str
     deliveries: tuple[TransformedDelivery, ...]
-    
+
 def _transform_innings(
     innings: tuple[InningsRecord, ...],
 ) -> tuple[TransformedInnings, ...]:
@@ -127,7 +129,7 @@ def _transform_teams(
         )
         for team in teams
     )
-    
+
 def _transform_players(
     players: tuple[PlayerRecord, ...],
 ) -> tuple[TransformedPlayer, ...]:
@@ -140,7 +142,7 @@ def _transform_players(
         )
         for player in players
     )
-    
+
 def _transform_venue(
     venue: VenueRecord | None,
 ) -> TransformedVenue | None:
@@ -155,7 +157,7 @@ def _transform_venue(
         if venue.city
         else None,
     )
-    
+
 def _transform_match(
     match: MatchRecord,
 ) -> TransformedMatch:
@@ -168,11 +170,13 @@ def _transform_match(
         toss_winner=match.toss_winner,
         toss_decision=match.toss_decision,
         winner=match.winner,
+        outcome_result=match.outcome_result,
+        outcome_deciding_team=match.outcome_deciding_team,
         match_type=match.match_type,
         gender=match.gender,
         player_of_match=match.player_of_match,
     )
-    
+
 @dataclass(frozen=True)
 class TransformedMatchPackage:
     match: TransformedMatch
@@ -180,7 +184,7 @@ class TransformedMatchPackage:
     players: tuple[TransformedPlayer, ...]
     venue: TransformedVenue | None
     innings: tuple[TransformedInnings, ...]
-    
+
 def transform_match(
     match: MatchRecord,
 ) -> TransformedMatchPackage:

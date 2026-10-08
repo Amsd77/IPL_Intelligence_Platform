@@ -178,6 +178,19 @@ def insert_match(
     )
 
     if existing is not None:
+        existing.winner_id = team_map.get(
+            package.match.winner
+        )
+
+        existing.outcome_result = (
+            package.match.outcome_result
+        )
+
+        existing.outcome_deciding_team_id = team_map.get(
+            package.match.outcome_deciding_team
+        )
+
+        session.flush()
         return
 
     match = Match(
@@ -185,6 +198,10 @@ def insert_match(
         season=package.match.season,
         match_date=package.match.match_date,
         venue_id=venue_id,
+        outcome_result=package.match.outcome_result,
+        outcome_deciding_team_id=team_map.get(
+        package.match.outcome_deciding_team
+        ),
         city=(
             package.venue.city
             if package.venue is not None
