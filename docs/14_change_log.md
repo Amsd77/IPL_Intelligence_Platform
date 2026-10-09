@@ -1,5 +1,47 @@
 # Change Log
 
+## 2026-10-08 — Analytics Foundation: Match Outcomes and Team Head-to-Head
+
+### Match outcome preservation
+
+Preserved source match outcomes in `dim_match` using:
+- `outcome_result`
+- `outcome_deciding_team_id`
+
+The migration utility was added, and the outcome backfill was run against the source dataset. The schema already contained the required columns, and the backfill found all existing records synchronized:
+
+```text
+Source files : 1,243
+Updated      : 0
+Unchanged    : 1,243
+Missing DB   : 0
+```
+
+### Team head-to-head analytics
+
+Implemented `src/analytics/team_head_to_head.py` with:
+- overall head-to-head statistics
+- season-wise head-to-head statistics
+- positive/distinct team ID validation
+- tie/no-result classification
+- PostgreSQL-side team-pair aggregation
+
+A tie remains a tie even when a Super Over/eliminator deciding team is recorded separately.
+
+### Verification
+
+- H2H unit tests: **10 passed**
+- Full regression suite: **64 passed**
+- CSK vs MI: **41 matches** — CSK 20 wins, MI 21 wins
+- Reconciliation: `20 + 21 + 0 + 0 = 41`
+
+### Important engineering decisions
+
+- Preserve `outcome_result` and `outcome_deciding_team_id` separately from `winner_id`.
+- Perform H2H aggregation in PostgreSQL using two `match_team` joins.
+
+
+
 ## 2026-09-22 — Analytics Foundation: Venue Analytics
 
 ### Venue analytics

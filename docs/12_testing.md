@@ -1,5 +1,30 @@
 # 12 Testing
 
+## Latest Verification — Team Head-to-Head Analytics (2026-10-08)
+
+The full regression suite after the H2H addition passed:
+
+```text
+64 passed
+```
+
+The H2H feature has **10 dedicated unit tests** covering successful results, unknown pairs, invalid team IDs, same-team requests, and season-wise results.
+
+### PostgreSQL integration check
+
+The H2H SQL was executed against the real PostgreSQL dataset for CSK (`team_id=9`) and MI (`team_id=4`):
+
+```text
+Matches     : 41
+CSK wins    : 20
+MI wins     : 21
+Ties        : 0
+No results  : 0
+Reconciliation: 20 + 21 + 0 + 0 = 41
+```
+
+Manual integration script: `scripts/test_team_head_to_head.py`.
+
 ## 1. Testing Strategy
 
 Testing is layered so failures can be isolated quickly.

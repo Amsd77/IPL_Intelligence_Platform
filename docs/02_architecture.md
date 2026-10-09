@@ -140,6 +140,17 @@ For innings analytics, legal deliveries exclude deliveries containing `wides` or
 
 Innings wickets lost exclude `retired hurt`, because that event does not represent a dismissal/wicket lost in scorecard-style innings analytics.
 
+### Team head-to-head analytics
+
+The H2H module identifies matches by joining `match_team` twice, once for each requested team. This ensures a match is included only when both teams participated. Aggregation is performed in PostgreSQL rather than loading match history into Python.
+
+The result contract classifies:
+- normal wins through `dim_match.winner_id`
+- ties through `dim_match.outcome_result = 'tie'`
+- no-result matches through `dim_match.outcome_result = 'no result'`
+
+`dim_match.outcome_deciding_team_id` preserves the Super Over/eliminator deciding team separately. A deciding team does not change a source-recorded tie into a normal H2H win. Overall and season-wise functions use the same classification rules and reject non-positive or identical team IDs.
+
 ## 6. Important Design Decisions
 
 ### Venue canonicalization boundary
