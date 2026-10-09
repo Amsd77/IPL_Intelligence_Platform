@@ -146,6 +146,16 @@ class Match(Base):
         nullable=True,
     )
 
+    outcome_result: Mapped[str | None] = mapped_column(
+        String(30),
+        nullable=True,
+    )
+
+    outcome_deciding_team_id: Mapped[int | None] = mapped_column(
+        ForeignKey("dim_team.team_id"),
+        nullable=True,
+    )
+
     match_type: Mapped[str | None] = mapped_column(
         String(50),
         nullable=True,
@@ -323,7 +333,7 @@ class DeliveryWicket(Base):
         String(50),
         nullable=False,
     )
-    
+
 class ETLFileQualityIssue(Base):
     __tablename__ = "etl_file_quality_issue"
 

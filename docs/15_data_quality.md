@@ -145,3 +145,29 @@ A production pipeline should make it possible to identify:
 - how severe it was
 - which file contained it
 - which run processed it
+
+## 9. Match Outcome Semantics
+
+The trusted match model preserves source outcome semantics separately from ordinary winners:
+
+| Field | Meaning |
+|---|---|
+| `winner_id` | Normal match winner, when present |
+| `outcome_result = 'tie'` | Source-recorded tie |
+| `outcome_result = 'no result'` | Source-recorded no-result match |
+| `outcome_deciding_team_id` | Team recorded as deciding a tie through a Super Over/eliminator |
+
+A deciding team is stored separately and does not convert a source-recorded tie into an ordinary win. Outcome values are parsed from source metadata rather than inferred from innings.
+
+The backfill check covered 1,243 source files: **0 updated, 1,243 unchanged, 0 missing database records**.
+
+## 10. Head-to-Head Analytical Semantics
+
+H2H aggregation includes a match only when both requested teams appear in `match_team`. Results are classified consistently:
+- `winner_id = Team A`: Team A win
+- `winner_id = Team B`: Team B win
+- `outcome_result = 'tie'`: tie
+- `outcome_result = 'no result'`: no result
+
+The deciding team for a Super Over/eliminator is not converted into an ordinary H2H win. Overall and season-wise aggregates are performed in PostgreSQL.
+

@@ -23,7 +23,7 @@ The planned platform will eventually cover:
 
 ## 3. Current Development Stage
 
-Current stage: **Analytics Foundation — data-engineering foundation completed and player, team, match, and venue analytics implemented**
+Current stage: **Analytics Foundation — data-engineering foundation completed; player, team, match, venue, and team head-to-head analytics implemented**
 
 Completed:
 
@@ -53,6 +53,23 @@ Completed:
 - Venue analytics
 - Venue Analytics
 
+### Team head-to-head analytics
+
+Implemented `src/analytics/team_head_to_head.py` with PostgreSQL-side aggregation for:
+- overall matches played and wins for each requested team
+- ties and no-result matches
+- season-wise head-to-head breakdowns
+- validation for positive, distinct team IDs
+
+A Super Over/eliminator deciding team is retained as outcome metadata; it does not convert a source-recorded tie into an ordinary head-to-head win.
+
+### Match outcome semantics
+
+The match model preserves source outcomes separately:
+- `winner_id`: normal match winner, when present
+- `outcome_result`: source result such as `tie` or `no result`
+- `outcome_deciding_team_id`: deciding team recorded for a tie resolved by a Super Over/eliminator
+
 ### Current verified dataset load
 
 - Source JSON files: **1,243**
@@ -65,6 +82,8 @@ Completed:
 - Processing failures: **0**
 - Reconciliation: **PASS**
 - Idempotency check: **PASS**
+
+- Team head-to-head analytics
 
 ## 4. Analytics Foundation
 

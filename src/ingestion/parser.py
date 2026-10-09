@@ -118,9 +118,10 @@ class MatchRecord:
 
     innings: tuple[InningsRecord, ...]
 
-def _parse_players(
-    info: dict[str, Any],
-) -> tuple[PlayerRecord, ...]:
+    outcome_result: str | None = None
+    outcome_deciding_team: str | None = None
+
+def _parse_players(info: dict[str, Any],) -> tuple[PlayerRecord, ...]:
     """Parse players and their Cricsheet registry IDs."""
 
     players: list[PlayerRecord] = []
@@ -177,7 +178,7 @@ def _parse_venue(info: dict[str, Any]) -> VenueRecord | None:
         name=str(venue),
         city=str(city) if city else None,
     )
-    
+
 def _parse_toss(info: dict[str, Any]) -> tuple[str | None, str | None]:
     """Parse toss winner and decision."""
 
@@ -193,21 +194,26 @@ def _parse_toss(info: dict[str, Any]) -> tuple[str | None, str | None]:
         str(winner) if winner else None,
         str(decision) if decision else None,
     )
-    
-def _parse_winner(info: dict[str, Any]) -> str | None:
-    """Extract the match winner when available."""
+
+def _parse_outcome(
+    info: dict[str, Any],
+) -> tuple[str | None, str | None, str | None]:
+    """Extract match outcome information when available."""
 
     outcome = info.get("outcome", {})
 
     if not isinstance(outcome, dict):
-        return None
+        return None, None, None
 
     winner = outcome.get("winner")
+    result = outcome.get("result")
+    eliminator = outcome.get("eliminator")
 
-    if winner:
-        return str(winner)
-
-    return None
+    return (
+        str(winner) if winner else None,
+        str(result) if result else None,
+        str(eliminator) if eliminator else None,
+    )
 
 def _parse_extras(raw_extras: Any) -> tuple[ExtraRecord, ...]:
     """Parse delivery extras."""
@@ -320,8 +326,8 @@ def _parse_delivery(
         extras=extras,
         wickets=wickets,
     )
-    
-    
+
+
 def _parse_innings(
     raw_innings: list[dict[str, Any]],
 ) -> tuple[InningsRecord, ...]:
@@ -464,10 +470,14 @@ def parse_match(data: dict[str, Any],match_id: int,) -> MatchRecord:
     toss_winner, toss_decision = _parse_toss(info)
 
     # --------------------------------------------------------
-    # Winner
+    # Outcome
     # --------------------------------------------------------
 
-    winner = _parse_winner(info)
+    (
+        winner,
+        outcome_result,
+        outcome_deciding_team,
+    ) = _parse_outcome(info)
 
     # --------------------------------------------------------
     # Match type / gender
@@ -521,10 +531,12 @@ def parse_match(data: dict[str, Any],match_id: int,) -> MatchRecord:
         toss_winner=toss_winner,
         toss_decision=toss_decision,
         winner=winner,
+        outcome_result=outcome_result,
+        outcome_deciding_team=outcome_deciding_team,
         match_type=str(match_type) if match_type else None,
         gender=str(gender) if gender else None,
         player_of_match=player_of_match,
         players=players,
         innings=innings,
     )
-    
+
